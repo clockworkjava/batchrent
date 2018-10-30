@@ -1,13 +1,16 @@
 package com.clockworkjava.batchrent;
 
 
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -16,6 +19,24 @@ import org.springframework.core.io.FileSystemResource;
 @EnableBatchProcessing
 public class BatchConfig {
 
+    @Autowired
+    public StepBuilderFactory stepBuilderFactory;
+
+
+    @Bean
+    public LineProcessor processor() {
+        return new LineProcessor();
+    }
+
+    @Bean
+    public Step step1(FlatFileItemWriter<String> writer) {
+        return stepBuilderFactory.get("step1")
+                .<String,String>chunk(10)
+                .reader(reader())
+                .processor(processor())
+                .writer(writer)
+                .build();
+    }
 
     @Bean
     public FlatFileItemReader<String> reader() {
