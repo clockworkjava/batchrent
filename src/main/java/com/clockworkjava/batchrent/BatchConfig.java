@@ -1,8 +1,10 @@
 package com.clockworkjava.batchrent;
 
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -21,6 +23,17 @@ public class BatchConfig {
 
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    public JobBuilderFactory jobBuilderFactory;
+
+    @Bean
+    public Job basicJob(Step step1) {
+        return jobBuilderFactory.get("basicjob")
+                .flow(step1)
+                .end()
+                .build();
+    }
 
 
     @Bean
