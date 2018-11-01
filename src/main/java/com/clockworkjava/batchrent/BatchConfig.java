@@ -10,12 +10,16 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
+import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.validation.BindException;
 
 @Configuration
 @EnableBatchProcessing
@@ -29,7 +33,8 @@ public class BatchConfig {
 
     @Bean
     public Job basicJob(Step step1) {
-        return jobBuilderFactory.get("basicjob")
+        return jobBuilderFactory
+                .get("basicjob")
                 .flow(step1)
                 .end()
                 .build();
@@ -66,6 +71,20 @@ public class BatchConfig {
                 .name("lineWriter")
                 .resource(new FileSystemResource("output/upppercasedLines.txt"))
                 .lineAggregator(new PassThroughLineAggregator<>())
+                .build();
+    }
+
+    @Bean
+    public FlatFileItemReader<Car> carCsvReader() {
+        return new FlatFileItemReaderBuilder<Car>()
+                .name("carCsvReader")
+                .resource(new FileSystemResource("input/johns.csv"))
+                .delimited()
+                .delimiter(",")
+                .names(new String[]{"make","model","rentingCostPerHour"})
+                .fieldSetMapper(new BeanWrapperFieldSetMapper<Car>(){{
+                    setTargetType(Car.class);
+                }})
                 .build();
     }
 }

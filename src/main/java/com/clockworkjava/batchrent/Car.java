@@ -14,15 +14,15 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    private String mark;
+    private String make;
     private String model;
     private BigDecimal rentingCostPerHour;
 
     public Car() {
     }
 
-    public Car(String mark, String model, BigDecimal rentingCostPerHour) {
-        this.mark = mark;
+    public Car(String make, String model, BigDecimal rentingCostPerHour) {
+        this.make = make;
         this.model = model;
         this.rentingCostPerHour = rentingCostPerHour;
     }
@@ -31,7 +31,7 @@ public class Car {
     public String toString() {
         return "Car{" +
                 "id=" + id +
-                ", mark='" + mark + '\'' +
+                ", mark='" + make + '\'' +
                 ", model='" + model + '\'' +
                 ", rentingCostPerHour=" + rentingCostPerHour +
                 '}';
@@ -43,13 +43,13 @@ public class Car {
         if (o == null || getClass() != o.getClass()) return false;
         Car car = (Car) o;
         return id == car.id &&
-                Objects.equals(mark, car.mark) &&
+                Objects.equals(make, car.make) &&
                 Objects.equals(model, car.model) &&
                 Objects.equals(rentingCostPerHour, car.rentingCostPerHour);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, mark, model, rentingCostPerHour);
+        return Objects.hash(id, make, model, rentingCostPerHour);
     }
 }
