@@ -6,6 +6,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -21,6 +22,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.validation.BindException;
 
+import javax.persistence.EntityManagerFactory;
+
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig {
@@ -30,6 +33,9 @@ public class BatchConfig {
 
     @Autowired
     public JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    public EntityManagerFactory emf;
 
     @Bean
     public Job basicJob(Step step1) {
@@ -86,5 +92,11 @@ public class BatchConfig {
                     setTargetType(Car.class);
                 }})
                 .build();
+    }
+
+    public JpaItemWriter<Car> carDbWriter() {
+        JpaItemWriter<Car> writer = new JpaItemWriter<>();
+        writer.setEntityManagerFactory(emf);
+        return writer;
     }
 }
