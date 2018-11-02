@@ -38,10 +38,11 @@ public class BatchConfig {
     public EntityManagerFactory emf;
 
     @Bean
-    public Job basicJob(Step step1) {
+    public Job basicJob(Step step1, Step step2) {
         return jobBuilderFactory
                 .get("basicjob")
                 .flow(step1)
+                .next(step2)
                 .end()
                 .build();
     }
@@ -94,9 +95,19 @@ public class BatchConfig {
                 .build();
     }
 
+    @Bean
     public JpaItemWriter<Car> carDbWriter() {
         JpaItemWriter<Car> writer = new JpaItemWriter<>();
         writer.setEntityManagerFactory(emf);
         return writer;
+    }
+
+    @Bean
+    public Step step2(JpaItemWriter<Car> writer) {
+        return stepBuilderFactory.get("step2")
+                .<Car,Car>chunk(10)
+                .reader(carCsvReader())
+                .writer(writer)
+                .build();
     }
 }
