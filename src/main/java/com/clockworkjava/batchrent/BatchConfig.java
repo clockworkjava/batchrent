@@ -87,7 +87,7 @@ public class BatchConfig {
                 .name("carCsvReader")
                 .resource(new FileSystemResource("input/johns.csv"))
                 .delimited()
-                .delimiter(",")
+                .delimiter("#")
                 .names(new String[]{"make","model","rentingCostPerHour"})
                 .fieldSetMapper(new BeanWrapperFieldSetMapper<Car>(){{
                     setTargetType(Car.class);
