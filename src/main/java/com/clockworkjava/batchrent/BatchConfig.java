@@ -6,7 +6,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JpaItemWriter;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -23,6 +25,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.validation.BindException;
 
 import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 
 @Configuration
 @EnableBatchProcessing
@@ -38,11 +41,12 @@ public class BatchConfig {
     public EntityManagerFactory emf;
 
     @Bean
-    public Job basicJob(Step step1, Step step2) {
+    public Job basicJob(Step step1, Step step2, Step step3) {
         return jobBuilderFactory
                 .get("basicjob")
                 .flow(step1)
                 .next(step2)
+                .next(step3)
                 .end()
                 .build();
     }
@@ -115,6 +119,25 @@ public class BatchConfig {
                 .reader(carCsvReader())
                 .processor(jeepFilter())
                 .writer(writer)
+                .build();
+    }
+
+    @Bean
+    public Step step3(JpaItemWriter<Car> writer, DataSource dataSource) {
+        return stepBuilderFactory.get("step3")
+                .<Car,Car>chunk(10)
+                .reader(dbReader(dataSource))
+                .writer(writer)
+                .build();
+    }
+
+    @Bean
+    public JdbcCursorItemReader<Car> dbReader(DataSource dataSource) {
+        return new JdbcCursorItemReaderBuilder<Car>()
+                .name("dbReader")
+                .dataSource(dataSource)
+                .sql("SELECT make, model, cost FROM sunny_ride_rent")
+                .rowMapper(new CarRowMapper())
                 .build();
     }
 }
