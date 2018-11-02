@@ -92,6 +92,7 @@ public class BatchConfig {
                 .fieldSetMapper(new BeanWrapperFieldSetMapper<Car>(){{
                     setTargetType(Car.class);
                 }})
+                .linesToSkip(1)
                 .build();
     }
 
