@@ -104,10 +104,16 @@ public class BatchConfig {
     }
 
     @Bean
+    public JeepFilter jeepFilter() {
+        return new JeepFilter();
+    }
+
+    @Bean
     public Step step2(JpaItemWriter<Car> writer) {
         return stepBuilderFactory.get("step2")
                 .<Car,Car>chunk(10)
                 .reader(carCsvReader())
+                .processor(jeepFilter())
                 .writer(writer)
                 .build();
     }
